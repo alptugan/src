@@ -149,7 +149,7 @@ package com.filikatasarim.tatu.MathingGame
 			imageC.alpha = 0;
 			imageC.rotationX = -90;
 			TweenLite.to(imageD, animationTime, {alpha:1, rotationX:90,ease:Quint.easeIn, onComplete:openComplete, overwrite:0});
-			TweenLite.to(imageC,animationTime, {alpha:1,delay:animationTime, rotationX:0,delay:0, ease:Elastic.easeOut,overwrite:0});
+			TweenLite.to(imageC,animationTime, {alpha:1,delay:animationTime, rotationX:0, ease:Quint.easeOut,overwrite:0});
 		}
 		
 		private function openComplete():void {

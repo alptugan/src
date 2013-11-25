@@ -14,11 +14,6 @@ package com.filikatasarim.tatu.MathingGame
 		
 		private var txt : ATextSingleLine;
 		
-		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Roman.otf", embedAsCFF="false", fontName="regular", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
-		public var Roman:Class;
-		
-		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Bd.otf", embedAsCFF="false", fontName="bold", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
-		public var Bold:Class;
 		
 		public var tm:int;
 		private var tmText:String;

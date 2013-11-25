@@ -1,21 +1,38 @@
 package com.filikatasarim.tatu.MathingGame
 {
+	import com.alptugan.display.Gradient_Bg;
+	import com.alptugan.events.AButtonEvent;
+	import com.alptugan.globals.RootAir;
 	import com.alptugan.utils.LoadXML;
 	import com.greensock.TweenLite;
 	import com.greensock.easing.EaseLookup;
 	import com.greensock.easing.Expo;
 	
+	import flash.display.GradientType;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.URLVariables;
+	import flash.net.dns.AAAARecord;
 	import flash.utils.Timer;
 	
 	import org.casalib.display.CasaSprite;
 	import org.casalib.time.Interval;
+	import org.casalib.util.UrlVariablesUtil;
 	import org.osmf.events.TimeEvent;
 	
 	public class Core extends CasaSprite
 	{
+		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Roman.otf", embedAsCFF="false", fontName="regular", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
+		public var Roman:Class;
+		
+		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Bd.otf", embedAsCFF="false", fontName="bold", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
+		public var Bold:Class;
+		
+		
 		private var first_tile:Tile;
 		private var second_tile:Tile;
 		private var pause_timer:Timer;
@@ -64,6 +81,12 @@ package com.filikatasarim.tatu.MathingGame
 		
 		private var searchStr:String;
 		private var xmlLoad:LoadXML;
+
+		private var scene1:SaveDialogScreen;
+		private var cacheObject:Object = new Object();
+		
+		private var bg :Gradient_Bg;
+		private var phpURL:String ="http://localhost:8888/test/add_score.php";
 		
 		public function Core()
 		{
@@ -74,11 +97,53 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,onComplete);
 			
+			bg = new Gradient_Bg(RootAir.W,RootAir.H,[0x8e44ad,0x9b59b6],GradientType.LINEAR);
+			addChild(bg);
+			
 			mainHolder = new CasaSprite();
 			addChild(mainHolder);
 			
 			img_ArrPlacement = img_Arr;
 			
+			// Shoe save screeen
+			scene1 = new SaveDialogScreen();
+			addChild(scene1);
+			
+			scene1.addEventListener(AButtonEvent.BUTTON_CLICKED,onclickedSave);
+			
+			/*
+			*/
+			
+		}
+		
+		/**
+		 * When user hits kaydet, user's data stored to the cache 
+		 * @param e
+		 * 
+		 */
+		protected function onclickedSave(e:AButtonEvent):void
+		{
+			//trace(e.inputName,e.inputSurname,e.inputEmail,e.inputTel);
+			// store variables to the cache
+			cacheObject.name = e.inputName;
+			cacheObject.surname = e.inputSurname;
+			cacheObject.email = e.inputEmail;
+			cacheObject.tel = e.inputTel;
+			cacheObject.score = 10000000000;
+	
+			
+			loadGameScene2();
+		}
+		
+		
+		
+		
+		/**
+		 * After user recor, start game 
+		 * 
+		 */		
+		private function loadGameScene2():void
+		{
 			for (y=0; y<4; y++) {
 				for (x=0; x<5; x++) {
 					id = x + (y*5);
@@ -96,14 +161,17 @@ package com.filikatasarim.tatu.MathingGame
 				}
 			}
 			
-			xmlLoad = new LoadXML("http://localhost/topten.php");
-						
+			xmlLoad = new LoadXML("http://localhost:8888/test/topten.php");
+			
 			
 			mainHolder.scaleX = mainHolder.scaleY = 0.6;
 			addTimer();
-			
 		}
 		
+		/**
+		 * GAME TIMER 
+		 * 
+		 */
 		private function addTimer():void
 		{
 			t = new Time();
@@ -111,12 +179,21 @@ package com.filikatasarim.tatu.MathingGame
 			addChild(t);
 		}
 		
+		/**
+		 * GAME FINISHED  
+		 * @param e
+		 * 
+		 */		
 		private function GameFinished(e:Event) :void{
 			
 			TweenLite.to(t,0.5,{alpha:0,y:"-200",ease:Expo.easeOut});
 			TweenLite.to(mainHolder,0.5,{alpha:0,delay:0.3,ease:Expo.easeOut,onComplete:onGameFinishComplete});
 		}
 		
+		/**
+		 * GAME FINISHED COMPLETE 
+		 * 
+		 */
 		private function onGameFinishComplete():void {
 			for(var i: int = 0; i < tiles.length ; i++){
 				
@@ -197,6 +274,29 @@ package com.filikatasarim.tatu.MathingGame
 			}
 			
 			
+		}
+		
+		/**
+		 * SAVE USER INFO TO DATABASE 
+		 * 
+		 */
+		private function saveScoreToDataBase():void {
+			var urlLoader:URLLoader = new URLLoader();
+			var req:URLRequest = new URLRequest(phpURL);
+			var requestVars:URLVariables = new URLVariables();
+			requestVars.pScore = cacheObject.score; 
+			requestVars.pName = cacheObject.name;
+			requestVars.pSurname = cacheObject.surname;
+			requestVars.pEmail = cacheObject.email;
+			requestVars.pTelephone = cacheObject.tel;
+			req.data = requestVars;
+			req.method = URLRequestMethod.POST;
+			urlLoader.load(req);
+			urlLoader.addEventListener(Event.COMPLETE, scoreSent);
+		}
+		
+		private function scoreSent(e:Event):void {
+			trace("score sent to php");
 		}
 		
 		protected function isTileAddedToStage(event:Event):void
