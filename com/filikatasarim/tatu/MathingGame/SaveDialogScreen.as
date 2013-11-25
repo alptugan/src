@@ -42,7 +42,7 @@ package com.filikatasarim.tatu.MathingGame
 			removeEventListener(Event.ADDED_TO_STAGE,onAdded);
 			
 			blackBox = new CasaShape();
-			blackBox.graphics.beginFill(0x000000,0.95);
+			blackBox.graphics.beginFill(0x2c3e50,0.95);
 			blackBox.graphics.drawRect(0,0,RootAir.W,RootAir.H);
 			blackBox.graphics.endFill();
 			
@@ -80,19 +80,36 @@ package com.filikatasarim.tatu.MathingGame
 			send.y = holder.height+10;
 			send.addEventListener(MouseEvent.CLICK,onClick);
 			
-			TweenMax.from(blackBox,0.5,{alpha:0,ease:Expo.easeOut});
-			TweenMax.from(inputName,0.5,{alpha:0,delay:0.1,y:"-100",ease:Expo.easeOut});
-			TweenMax.from(inputSurname,0.5,{alpha:0,delay:0.15,y:"-100",ease:Expo.easeOut});
-			TweenMax.from(inputTel,0.5,{alpha:0,delay:0.2,y:"-100",ease:Expo.easeOut});
-			TweenMax.from(inputEmail,0.5,{alpha:0,delay:0.25,y:"-100",ease:Expo.easeOut});
-			TweenMax.from(send,0.5,{alpha:0,delay:0.3,y:"300",ease:Expo.easeOut});
+			inputName.alpha = inputSurname.alpha =inputTel.alpha=inputEmail.alpha=send.alpha=0;
+			//initialize();
+			inputName.y = inputName.y-100;
+			inputSurname.y = inputSurname.y-100;
+			inputTel.y = inputTel.y-100;
+			inputEmail.y = inputEmail.y-100;
+			send.y = send.y+300;
+		}
+		
+		
+		public function initDialog():void
+		{
+			TweenMax.to(blackBox,0.5,{autoAlpha:1,ease:Expo.easeOut});
+			TweenMax.to(inputName,0.5,{autoAlpha:1,delay:0.1,y:"100",ease:Expo.easeOut});
+			TweenMax.to(inputSurname,0.5,{autoAlpha:1,delay:0.15,y:"100",ease:Expo.easeOut});
+			TweenMax.to(inputTel,0.5,{autoAlpha:1,delay:0.2,y:"100",ease:Expo.easeOut});
+			TweenMax.to(inputEmail,0.5,{autoAlpha:1,delay:0.25,y:"100",ease:Expo.easeOut});
+			TweenMax.to(send,0.5,{autoAlpha:1,delay:0.3,y:"-300",ease:Expo.easeOut});
 		}
 		
 		protected function onClick(e:MouseEvent):void
 		{
 			var ev:AButtonEvent = new AButtonEvent(AButtonEvent.BUTTON_CLICKED,inputName.Tf.text,inputSurname.Tf.text,inputEmail.Tf.text,inputTel.Tf.text);
-			TweenMax.to(holder,0.8,{alpha:0,y:"-100",ease:Back.easeInOut});
-			TweenMax.to(blackBox,0.8,{alpha:0,delay:0.4,ease:Back.easeInOut,onComplete:function():void{dispatchEvent(ev);}});
+			
+			TweenMax.to(inputName,0.5,{autoAlpha:0,delay:0.1,y:"-100",ease:Expo.easeOut});
+			TweenMax.to(inputSurname,0.5,{autoAlpha:0,delay:0.15,y:"-100",ease:Expo.easeOut});
+			TweenMax.to(inputTel,0.5,{autoAlpha:0,delay:0.2,y:"-100",ease:Expo.easeOut});
+			TweenMax.to(inputEmail,0.5,{autoAlpha:0,delay:0.25,y:"-100",ease:Expo.easeOut});
+			TweenMax.to(send,0.5,{autoAlpha:0,delay:0.3,y:"300",ease:Expo.easeOut});
+			TweenMax.to(blackBox,0.8,{autoAlpha:0,delay:0.35,ease:Back.easeInOut,onComplete:function():void{dispatchEvent(ev);}});
 		}
 	}
 }

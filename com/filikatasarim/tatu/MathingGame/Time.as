@@ -27,7 +27,7 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,onAdded);
 			
-			txt = new ATextSingleLine("01:00","bold",0x000000,86);
+			txt = new ATextSingleLine("01:00","bold",0xecf0f1,80);
 			addChild(txt);
 			
 			Aligner.alignToCenterTopToBounds(txt,stage.stageWidth,0,14);
