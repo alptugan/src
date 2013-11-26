@@ -43,7 +43,7 @@ package com.filikatasarim.tatu.MathingGame
 			
 			blackBox = new CasaShape();
 			blackBox.graphics.beginFill(0x2c3e50,0.95);
-			blackBox.graphics.drawRect(0,0,RootAir.W,RootAir.H);
+			blackBox.graphics.drawRect(0,0,stage.stageWidth,stage.stageHeight);
 			blackBox.graphics.endFill();
 			
 			addChild(blackBox);
@@ -76,6 +76,7 @@ package com.filikatasarim.tatu.MathingGame
 			// Send Button
 			send = new AButton("KAYDET", "bold",0xffffff,34,true,true);
 			holder.addChild(send);
+			
 			send.x = holder.width - send.width >> 1;
 			send.y = holder.height+10;
 			send.addEventListener(MouseEvent.CLICK,onClick);

@@ -35,6 +35,8 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			this.imageSrc = imageSrc;
 			addEventListener(Event.ADDED_TO_STAGE, onAdded);
+			/*this.x = imageW*0.5;
+			this.y = imageH*0.5;*/
 		}
 		
 		protected function onAdded(e:Event):void
@@ -54,9 +56,9 @@ package com.filikatasarim.tatu.MathingGame
 				container:imageC, 
 				width:imageW,
 				height:imageH, 
-				x:0, 
-				y:0,
-				scaleMode:"proportionalInside", 
+				x:-imageW/2, 
+				y:-imageH/2,
+				scaleMode:"none", 
 				centerRegistration:false,
 				noCache:true,
 				autoDispose:true,
@@ -68,8 +70,7 @@ package com.filikatasarim.tatu.MathingGame
 			
 			
 			
-			this.x = imageW*0.5;
-			this.y = imageH*0.5;
+			
 			
 			
 			//imageC.addChild(loaderC);
@@ -82,10 +83,7 @@ package com.filikatasarim.tatu.MathingGame
 		protected function onImageCLoad(event:LoaderEvent):void {
 			
 			//TweenLite.from(loaderC.content, 0.5, {alpha:0});
-			
-			loaderC.content.x =  - loaderC.content.width/2;
-			loaderC.content.y =  - loaderC.content.height/2;
-			
+		
 			
 			
 			loaderD = new ImageLoader(imageBackSrc, {name:imageName, 
@@ -93,9 +91,9 @@ package com.filikatasarim.tatu.MathingGame
 				container:imageD, 
 				width:imageW,
 				height:imageH, 
-				x:0, 
-				y:0,
-				scaleMode:"proportionalInside", 
+				x:-imageW/2, 
+				y:-imageH/2,
+				scaleMode:"none", 
 				centerRegistration:false,
 				noCache:true,
 				autoDispose:true,

@@ -78,10 +78,11 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,onComplete);
 			
-			bg = new Gradient_Bg(RootAir.W+30,RootAir.H+30,[0x8e44ad,0x9b59b6],GradientType.LINEAR);
-			addChild(bg);
-			bg.x =-10;
-			bg.y= -10;
+			bg = new Gradient_Bg(RootAir.W+40,RootAir.H+40,[0x8e44ad,0x9b59b6],GradientType.LINEAR);
+			stage.addChildAt(bg,0);
+			
+			/*bg.x = -20;
+			bg.y = -20;*/
 			
 			
 			// Shoe save screeen
@@ -89,6 +90,16 @@ package com.filikatasarim.tatu.MathingGame
 			addChild(scene1);
 			
 			initScene1();
+			
+			stage.addEventListener(Event.RESIZE,onResize);
+		}
+		
+		protected function onResize(event:Event):void
+		{
+			if(bg) {
+				bg.updateSize(RootAir.W,RootAir.H);
+				bg.x=0;
+			}
 		}
 		
 		private function initScene1():void
@@ -156,8 +167,11 @@ package com.filikatasarim.tatu.MathingGame
 		 */		
 		private function initScene2():void
 		{
+			/*bg.x = -5;
+			bg.y = -4;*/
 			mainHolder = new CasaSprite();
 			addChild(mainHolder);
+			
 			
 			for (y=0; y<4; y++) {
 				for (x=0; x<5; x++) {
@@ -176,7 +190,6 @@ package com.filikatasarim.tatu.MathingGame
 					//first_tile.addEventListener("isLoaded", isTileAddedToStage);
 				}
 			}
-			
 			
 			mainHolder.scaleX = mainHolder.scaleY = 0.6;
 			addTimer();
@@ -222,6 +235,7 @@ package com.filikatasarim.tatu.MathingGame
 			
 			mainHolder.removeAllChildrenAndDestroy(true,true);
 			cacheObject.score = 60 - gameScoreTime;
+
 			saveScoreToDataBase();
 			
 		}
