@@ -6,12 +6,14 @@ package com.filikatasarim.tatu.MathingGame
 	import com.greensock.loading.ImageLoader;
 	
 	import flash.events.Event;
+	import flash.geom.PerspectiveProjection;
+	import flash.geom.Point;
 	
 	import org.casalib.display.CasaSprite;
 	
 	public class Tile extends CasaSprite
 	{
-		private var animationTime:Number = 0.3;
+		private var animationTime:Number = 0.2;
 		private var imageOnStage:Number = 1;
 		private var imageC:CasaSprite;
 		private var imageD:CasaSprite;
@@ -30,19 +32,37 @@ package com.filikatasarim.tatu.MathingGame
 		
 		public var id:String;
 		
+		private var pp1:PerspectiveProjection=new PerspectiveProjection();
+		
+		private var pp2:PerspectiveProjection=new PerspectiveProjection();
+		
 		
 		public function Tile(imageSrc:String)
 		{
 			this.imageSrc = imageSrc;
 			addEventListener(Event.ADDED_TO_STAGE, onAdded);
+			
+			/*this.x = imageW*0.5;
+			this.y = imageH*0.5;*/
+		}
+		
+		public function unLoadTiles():void
+		{
+			removeEventListeners();
+			TweenMax.killAll(true);
+			loaderC.unload();
+			loaderD.unload();
+			loaderD.dispose(true);
+			loaderC.dispose(true);
+			
 		}
 		
 		protected function onAdded(e:Event):void
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 			
-			
-			
+		
+			root.transform.perspectiveProjection.fieldOfView = 100;
 			imageC = new CasaSprite();
 			imageD = new CasaSprite();
 			
@@ -54,9 +74,9 @@ package com.filikatasarim.tatu.MathingGame
 				container:imageC, 
 				width:imageW,
 				height:imageH, 
-				x:0, 
-				y:0,
-				scaleMode:"proportionalInside", 
+				x:-imageW/2, 
+				y:-imageH/2,
+				scaleMode:"none", 
 				centerRegistration:false,
 				noCache:true,
 				autoDispose:true,
@@ -68,8 +88,7 @@ package com.filikatasarim.tatu.MathingGame
 			
 			
 			
-			this.x = imageW*0.5;
-			this.y = imageH*0.5;
+			
 			
 			
 			//imageC.addChild(loaderC);
@@ -82,10 +101,7 @@ package com.filikatasarim.tatu.MathingGame
 		protected function onImageCLoad(event:LoaderEvent):void {
 			
 			//TweenLite.from(loaderC.content, 0.5, {alpha:0});
-			
-			loaderC.content.x =  - loaderC.content.width/2;
-			loaderC.content.y =  - loaderC.content.height/2;
-			
+		
 			
 			
 			loaderD = new ImageLoader(imageBackSrc, {name:imageName, 
@@ -93,9 +109,9 @@ package com.filikatasarim.tatu.MathingGame
 				container:imageD, 
 				width:imageW,
 				height:imageH, 
-				x:0, 
-				y:0,
-				scaleMode:"proportionalInside", 
+				x:-imageW/2, 
+				y:-imageH/2,
+				scaleMode:"none", 
 				centerRegistration:false,
 				noCache:true,
 				autoDispose:true,
@@ -115,10 +131,23 @@ package com.filikatasarim.tatu.MathingGame
 			
 			
 			
+			
 			imageC.rotationX = 0;
 			imageD.rotationX = 0;
 		
 			//dispatchEvent(new Event("isLoaded"));
+			
+			pp1.fieldOfView=100;
+			pp1.projectionCenter=new Point(imageC.x,imageC.y);
+			
+			pp2.fieldOfView=100;
+			pp2.projectionCenter=new Point(imageD.x,imageD.y);
+			
+			
+			imageC.transform.perspectiveProjection=pp1;
+			imageD.transform.perspectiveProjection=pp2;
+			
+			
 			
 			close();
 			
@@ -128,8 +157,8 @@ package com.filikatasarim.tatu.MathingGame
 			
 			imageD.rotationX = -90;
 			imageD.alpha = 0;
-			TweenLite.to(imageC, animationTime, {alpha:1,rotationX:90,ease:Quint.easeIn, onComplete:closeComplete, overwrite:0});
-			TweenLite.to(imageD,animationTime, {alpha:1,delay:animationTime, rotationX:0, ease:Elastic.easeOut, overwrite:0});
+			TweenMax.to(imageC, animationTime, {alpha:1,rotationX:90,ease:Quint.easeIn, onComplete:closeComplete, overwrite:0});
+			TweenMax.to(imageD,animationTime, {alpha:1,delay:animationTime, rotationX:0, ease:Elastic.easeOut, overwrite:0});
 			
 		}
 		public function closeComplete():void{
@@ -148,8 +177,8 @@ package com.filikatasarim.tatu.MathingGame
 			state = 1;
 			imageC.alpha = 0;
 			imageC.rotationX = -90;
-			TweenLite.to(imageD, animationTime, {alpha:1, rotationX:90,ease:Quint.easeIn, onComplete:openComplete, overwrite:0});
-			TweenLite.to(imageC,animationTime, {alpha:1,delay:animationTime, rotationX:0,delay:0, ease:Elastic.easeOut,overwrite:0});
+			TweenMax.to(imageD, animationTime, {alpha:1, rotationX:90,ease:Quint.easeIn, onComplete:openComplete, overwrite:0});
+			TweenMax.to(imageC,animationTime, {alpha:1,delay:animationTime, rotationX:0, ease:Quint.easeOut,overwrite:0});
 		}
 		
 		private function openComplete():void {
@@ -162,8 +191,8 @@ package com.filikatasarim.tatu.MathingGame
 			
 			imageD.rotationX = -90;
 			imageD.alpha = 0;
-			TweenLite.to(imageC, animationTime, {alpha:1,delay:imageOnStage,rotationX:90,ease:Quint.easeIn, onComplete:resetComplete, overwrite:0});
-			TweenLite.to(imageD,animationTime, {alpha:1,delay:imageOnStage+animationTime, rotationX:0, ease:Elastic.easeOut, overwrite:0});
+			TweenMax.to(imageC, animationTime, {alpha:1,delay:imageOnStage,rotationX:90,ease:Quint.easeIn, onComplete:resetComplete, overwrite:0});
+			TweenMax.to(imageD,animationTime, {alpha:1,delay:imageOnStage+animationTime, rotationX:0, ease:Elastic.easeOut, overwrite:0});
 			
 		}
 		

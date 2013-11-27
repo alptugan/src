@@ -14,14 +14,10 @@ package com.filikatasarim.tatu.MathingGame
 		
 		private var txt : ATextSingleLine;
 		
-		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Roman.otf", embedAsCFF="false", fontName="regular", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
-		public var Roman:Class;
-		
-		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Bd.otf", embedAsCFF="false", fontName="bold", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
-		public var Bold:Class;
-		
+		public var gameLength:int = 60*3;
 		public var tm:int;
 		private var tmText:String;
+		private var timeTxt:String = "03:00";
 		
 		public function Time()
 		{
@@ -32,7 +28,7 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,onAdded);
 			
-			txt = new ATextSingleLine("01:00","bold",0x000000,86);
+			txt = new ATextSingleLine(timeTxt,"bold",0xecf0f1,80);
 			addChild(txt);
 			
 			Aligner.alignToCenterTopToBounds(txt,stage.stageWidth,0,14);
@@ -40,15 +36,15 @@ package com.filikatasarim.tatu.MathingGame
 			
 			time = Interval.setInterval(this._repeatingFunction, 1000, "CASA");
 			//time.repeatCount = 10;
-			tm = 60;
+			tm = gameLength;
 			time.start();
 		}
 		
 		
 		public function restart():void {
 			time.stop();
-			txt.SetText("01:00");
-			tm = 60;
+			txt.SetText(timeTxt);
+			tm = gameLength;
 			time.start();
 		}
 		
@@ -57,22 +53,38 @@ package com.filikatasarim.tatu.MathingGame
 			if(tm != 0) {
 				tm--;
 			}
+						
+			// here is the magic
 			
-
-			tmText = "00:"+String(tm);
+			var min:int = Math.floor(tm/60); // we compute an absolute difference in minutes
+			var sec:int = Math.floor(tm - min*60);
+			//var ms:int = (tm)%1000; // we compute an absolute difference in milliseconds
 			
-			if(tm < 10) {
-				tmText = "00:0"+String(tm);
+			var mint:String;
+			var sect:String;
+			
+			if(min < 10) {
+				mint = "0"+String(min);
+			}else{
+				mint = String(min);
 			}
 			
+			if(sec < 10) {
+				sect = "0"+String(sec);
+			}else{
+				sect = String(sec);
+			}
+			
+			tmText = mint + ":" + String(sect);
 			
 			txt.SetText(tmText);
 			
 			if(tm == 0){
-				dispatchEvent(new Event("GameFinished"));
+				Core.endWhy = "time";
+				dispatchEvent(new Event("GameFinished",true));
 				time.stop();
-				txt.SetText("01:00");
-				tm = 60;
+				txt.SetText(timeTxt);
+				tm = gameLength;
 			}
 		}
 	}

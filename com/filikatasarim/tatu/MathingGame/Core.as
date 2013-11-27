@@ -1,21 +1,41 @@
 package com.filikatasarim.tatu.MathingGame
 {
+	import com.alptugan.display.Gradient_Bg;
+	import com.alptugan.events.AButtonEvent;
+	import com.alptugan.events.LoadXMLEvent;
+	import com.alptugan.globals.RootAir;
+	import com.alptugan.text.ATextSingleLine;
 	import com.alptugan.utils.LoadXML;
 	import com.greensock.TweenLite;
+	import com.greensock.TweenMax;
 	import com.greensock.easing.EaseLookup;
 	import com.greensock.easing.Expo;
 	
+	import flash.display.GradientType;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.net.URLLoader;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.URLVariables;
+	import flash.net.dns.AAAARecord;
 	import flash.utils.Timer;
 	
 	import org.casalib.display.CasaSprite;
 	import org.casalib.time.Interval;
+	import org.casalib.util.UrlVariablesUtil;
 	import org.osmf.events.TimeEvent;
 	
 	public class Core extends CasaSprite
 	{
+		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Roman.otf", embedAsCFF="false", fontName="regular", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
+		public var Roman:Class;
+		
+		[Embed(source="com/alptugan/assets/font/HelveticaNeueLTPro-Bd.otf", embedAsCFF="false", fontName="bold", mimeType="application/x-font", unicodeRange = "U+0000-U+007e,U+00c7,U+00d6,U+00dc,U+00e7,U+00f6,U+00fc,U+0101-U+011f,U+0103-U+0131,U+015e-U+015f")]
+		public var Bold:Class;
+		
+		public static var endWhy : String = "";
 		private var first_tile:Tile;
 		private var second_tile:Tile;
 		private var pause_timer:Timer;
@@ -36,34 +56,18 @@ package com.filikatasarim.tatu.MathingGame
 		private var prevIdm:int = -1;
 		private var isReset:Boolean = false;
 		
-		private var colordeck:Array = new Array(1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8);
-		private var img_Arr:Array = new Array(
-			"assets/puzzle1_transfer.jpg",
-			"assets/puzzle2_arackiralama.jpg",
-			"assets/puzzle3_hizligecisler.jpg",
-			"assets/puzzle4_lounge.jpg",
-			"assets/puzzle5_ring.jpg",
-			"assets/puzzle6_dutyfree.jpg",
-			"assets/puzzle7_restorankafeler.jpg",
-			"assets/puzzle8_checkin.jpg",
-			"assets/puzzle9_otoparkvale.jpg",
-			"assets/puzzle10_konaklama.jpg",
-			"assets/puzzle1_transfer.jpg",
-			"assets/puzzle2_arackiralama.jpg",
-			"assets/puzzle3_hizligecisler.jpg",
-			"assets/puzzle4_lounge.jpg",
-			"assets/puzzle5_ring.jpg",
-			"assets/puzzle6_dutyfree.jpg",
-			"assets/puzzle7_restorankafeler.jpg",
-			"assets/puzzle8_checkin.jpg",
-			"assets/puzzle9_otoparkvale.jpg",
-			"assets/puzzle10_konaklama.jpg"
-		);
+		private var img_Arr:Array;
 		
 		private var img_ArrPlacement:Array = [];
 		
 		private var searchStr:String;
 		private var xmlLoad:LoadXML;
+
+		private var scene1:SaveDialogScreen;
+		private var cacheObject:Object = new Object();
+		
+		private var bg :Gradient_Bg;
+		private var rootURL:String ="http://localhost/soundgame/";
 		
 		public function Core()
 		{
@@ -74,16 +78,110 @@ package com.filikatasarim.tatu.MathingGame
 		{
 			removeEventListener(Event.ADDED_TO_STAGE,onComplete);
 			
+			bg = new Gradient_Bg(RootAir.W+40,RootAir.H+40,[0x8e44ad,0x9b59b6],GradientType.LINEAR);
+			stage.addChildAt(bg,0);
+			
+			/*bg.x = -20;
+			bg.y = -20;*/
+			
+			
+			
+			
+			initScene1();
+			
+			stage.addEventListener(Event.RESIZE,onResize);
+		}
+		
+		protected function onResize(event:Event):void
+		{
+			if(bg) {
+				//bg.updateSize(RootAir.W,RootAir.H);
+				//bg.x=0;
+			}
+		}
+		
+		private function initScene1():void
+		{
+			// Shoe save screeen
+			scene1 = new SaveDialogScreen();
+			addChild(scene1);
+			
+			img_ArrPlacement.length = 0;
+			
+			img_ArrPlacement  = [
+				"assets/puzzle1_transfer.jpg",
+				"assets/puzzle2_arackiralama.jpg",
+				"assets/puzzle3_hizligecisler.jpg",
+				"assets/puzzle4_lounge.jpg",
+				"assets/puzzle5_ring.jpg",
+				"assets/puzzle6_dutyfree.jpg",
+				"assets/puzzle7_restorankafeler.jpg",
+				"assets/puzzle8_checkin.jpg",
+				"assets/puzzle9_otoparkvale.jpg",
+				"assets/puzzle10_konaklama.jpg",
+				"assets/puzzle1_transfer.jpg",
+				"assets/puzzle2_arackiralama.jpg",
+				"assets/puzzle3_hizligecisler.jpg",
+				"assets/puzzle4_lounge.jpg",
+				"assets/puzzle5_ring.jpg",
+				"assets/puzzle6_dutyfree.jpg",
+				"assets/puzzle7_restorankafeler.jpg",
+				"assets/puzzle8_checkin.jpg",
+				"assets/puzzle9_otoparkvale.jpg",
+				"assets/puzzle10_konaklama.jpg"
+			];
+			
+			scene1.initDialog();
+			//xmlLoad = new LoadXML("http://localhost:8888/test/topten.php");
+			//xmlLoad.addEventListener(LoadXMLEvent.XML_LOADED,onTopScoresLoaded);
+			//
+			
+			
+			scene1.addEventListener(AButtonEvent.BUTTON_CLICKED,onclickedSave);
+		}
+		
+		/**
+		 * When user hits kaydet, user's data stored to the cache 
+		 * @param e
+		 * 
+		 */
+		protected function onclickedSave(e:AButtonEvent):void
+		{
+			scene1.removeEventListener(AButtonEvent.BUTTON_CLICKED,onclickedSave);
+			scene1.removeAllChildrenAndDestroy(true,true);
+			//trace(e.inputName,e.inputSurname,e.inputEmail,e.inputTel);
+			// store variables to the cache
+			cacheObject.name = e.inputName;
+			cacheObject.surname = e.inputSurname;
+			cacheObject.email = e.inputEmail;
+			cacheObject.tel = e.inputTel;
+			cacheObject.score = 0;
+	
+			
+			initScene2();
+		}
+		
+		
+		
+		
+		/**
+		 * After user saved, start game 
+		 * 
+		 */		
+		private function initScene2():void
+		{
+			/*bg.x = -5;
+			bg.y = -4;*/
 			mainHolder = new CasaSprite();
 			addChild(mainHolder);
 			
-			img_ArrPlacement = img_Arr;
 			
 			for (y=0; y<4; y++) {
 				for (x=0; x<5; x++) {
 					id = x + (y*5);
 					var randomImg : int = Math.floor(Math.random()*img_ArrPlacement.length);
 					tiles[id] = new Tile(img_ArrPlacement[randomImg]);
+					
 					img_ArrPlacement.splice(randomImg,1);
 					
 					mainHolder.addChild(tiles[id]);
@@ -96,14 +194,15 @@ package com.filikatasarim.tatu.MathingGame
 				}
 			}
 			
-			xmlLoad = new LoadXML("http://localhost/topten.php");
-						
-			
 			mainHolder.scaleX = mainHolder.scaleY = 0.6;
 			addTimer();
-			
+		
 		}
 		
+		/**
+		 * GAME TIMER 
+		 * 
+		 */
 		private function addTimer():void
 		{
 			t = new Time();
@@ -111,28 +210,111 @@ package com.filikatasarim.tatu.MathingGame
 			addChild(t);
 		}
 		
+		/**
+		 * GAME FINISHED  
+		 * @param e
+		 * 
+		 */		
 		private function GameFinished(e:Event) :void{
+			
+			removeEventListener("GameFinished",GameFinished);
+			t.removeAllChildrenAndDestroy(true,true);
 			
 			TweenLite.to(t,0.5,{alpha:0,y:"-200",ease:Expo.easeOut});
 			TweenLite.to(mainHolder,0.5,{alpha:0,delay:0.3,ease:Expo.easeOut,onComplete:onGameFinishComplete});
 		}
 		
+		/**
+		 * GAME FINISHED COMPLETE 
+		 * 
+		 */
 		private function onGameFinishComplete():void {
 			for(var i: int = 0; i < tiles.length ; i++){
-				
+				tiles[i].unLoadTiles();
 				tiles[i].removeEventListener(MouseEvent.CLICK,onClicked);
 				tiles[i].removeEventListeners();
-				tiles[i].close();
-				
-				tiles[i].addEventListener(MouseEvent.CLICK,onClicked);
+				tiles[i].removeAllChildrenAndDestroy(true,true);
 			}
 			
-			TweenLite.to(t,0.5,{alpha:1,y:"200",ease:Expo.easeOut,onComplete:function():void{t.restart();}});
-			TweenLite.to(mainHolder,0.5,{alpha:1,delay:0.3,ease:Expo.easeOut});
+			mainHolder.removeAllChildrenAndDestroy(true,true);
+			cacheObject.score = t.gameLength - gameScoreTime;
+
+			saveScoreToDataBase();
+			
+		}
+		
+		/**
+		 * SAVE USER INFO TO DATABASE 
+		 * 
+		 */
+		private function saveScoreToDataBase():void {
+			var urlLoader:URLLoader = new URLLoader();
+			var req:URLRequest = new URLRequest(rootURL+"add_score.php");
+			var requestVars:URLVariables = new URLVariables();
+			requestVars.pScore = cacheObject.score; 
+			requestVars.pName = cacheObject.name;
+			requestVars.pSurname = cacheObject.surname;
+			requestVars.pEmail = cacheObject.email;
+			requestVars.pTelephone = cacheObject.tel;
+			req.data = requestVars;
+			req.method = URLRequestMethod.POST;
+			urlLoader.load(req);
+			urlLoader.addEventListener(Event.COMPLETE, scoreSent);
+		}
+		
+		private function scoreSent(e:Event):void {
+			trace("score sent to php");
+			xmlLoad = new LoadXML(rootURL+"topten.php");
+			xmlLoad.addEventListener(LoadXMLEvent.XML_LOADED,onTopScoresLoaded);
 			
 			
 		}
 		
+		/**
+		 * TOP SCORE LOADED 
+		 * @param e
+		 * 
+		 */
+		protected function onTopScoresLoaded(e:LoadXMLEvent):void
+		{
+			xmlLoad.removeEventListener(LoadXMLEvent.XML_LOADED,onTopScoresLoaded);
+			
+			var con:CongratsScreen;
+			
+			if(Core.endWhy == "success")
+				con = new CongratsScreen("TEBRİKLER<br>" + cacheObject.name + " " + cacheObject.surname + "<br>oyunu <FONT SIZE='93'>"+String(cacheObject.score)+"</FONT> saniyede<br>bitirdiniz.");
+			else
+				con = new CongratsScreen("OYUNU BİTİREMEDİNİZ<br>" + cacheObject.name + " " + cacheObject.surname + "<br>Bir dahaki sefere tekrar deneyin");
+			
+			addChild(con);
+			
+			TweenMax.from(con,0.5,{alpha:0});
+			
+			TweenMax.to(con.multi,0.5,{alpha:0,delay:3.5,onComplete:function():void{
+				var str:String;
+				con.initTopScore("<FONT SIZE='73'>TOP 10</FONT>",50);
+				for (var i:int = 0; i < e.xmlContent.player.length(); i++) 
+				{
+					
+					str = String(e.xmlContent.player[i].name + " " + e.xmlContent.player[i].surname + " : " + e.xmlContent.player[i].score+" sn"+"<br>");
+					con.initTopScore(str,140+50*i,0.1*i);
+				}
+				
+				TweenMax.to(con,0.5,{alpha:0,delay:0.5*e.xmlContent.player.length(),onComplete:function():void{initScene1();con.removeAllChildrenAndDestroy(true,true);}});
+			}});
+			
+			
+			
+	
+		}
+		
+		
+		
+		/**
+		 * ON CLICK TILE 
+		 * @param e
+		 * 
+		 */
 		protected function onClicked(e:MouseEvent):void {
 			var idm:int = e.currentTarget.id;
 			
@@ -152,12 +334,19 @@ package com.filikatasarim.tatu.MathingGame
 					
 					
 					
+					tiles[idm].removeEventListener(MouseEvent.CLICK,onClicked);
+					if(prevIdm != -1)
+						tiles[prevIdm].removeEventListener(MouseEvent.CLICK,onClicked);
+					
 					if(searchStr != tiles[idm].imageSrc && prevIdm !=-1) {
 						//they are not equal
 						
 						tiles[prevIdm].reset();
 						tiles[idm].reset();
 						isReset = true;
+						if(prevIdm != -1)
+							tiles[prevIdm].addEventListener(MouseEvent.CLICK,onClicked);
+						tiles[idm].addEventListener(MouseEvent.CLICK,onClicked);
 					}
 					
 					if(searchStr == tiles[idm].imageSrc && prevIdm !=-1){
@@ -171,10 +360,11 @@ package com.filikatasarim.tatu.MathingGame
 						
 						scoreCount ++;
 						
-						if(scoreCount > 0) {
+						if(scoreCount > (tiles.length/2) - 1) {
 							gameScoreTime = t.tm;
-							trace("gameScoreTime :"+gameScoreTime);
+							//trace("gameScoreTime :"+gameScoreTime);
 							dispatchEvent(new Event("GameFinished",true));
+							Core.endWhy = "success";
 						}
 					}
 					
@@ -199,10 +389,5 @@ package com.filikatasarim.tatu.MathingGame
 			
 		}
 		
-		protected function isTileAddedToStage(event:Event):void
-		{
-			
-			
-		}
 	}
 }
